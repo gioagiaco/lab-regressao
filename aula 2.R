@@ -132,4 +132,3 @@ pib_cid %>%
   filter(pib_per_capita == min(pib_per_capita)) %>%
   select(nome_munic, sigla_uf, pib_total, pib_per_capita)
 
-
