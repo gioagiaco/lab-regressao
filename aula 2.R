@@ -132,3 +132,54 @@ pib_cid %>%
   filter(pib_per_capita == min(pib_per_capita)) %>%
   select(nome_munic, sigla_uf, pib_total, pib_per_capita)
 
+#agrupando por sigla uf - group
+df = pib_cid %>%
+  group_by(sigla_uf) %>%
+  summarise(pib_medio_uf = mean(pib_total))
+
+view(df)
+
+#visualização
+#gráficos
+library(ggplot2)
+
+pib_cid %>%
+  ggplot(aes(y=pib_total, x=impostos)) + geom_point()
+
+#graficos mais bonitos
+pib_cid %>%
+  ggplot(aes(y=pib_total, x=impostos)) + geom_point() +
+  scale_y_continuous(labels = scales::dollar) + theme_light() + theme(text=element_text(size=20)) +
+  xlab("impostos municipais") + ggtitle("PIB municipal de 2013 x impostos municipais")
+
+#temas feitos pela comunidade
+install.packages("remotes")
+remotes::install_github("MatthewBJane/theme_park")
+library(ThemePark)
+
+#barbie
+pib_cid %>%
+  ggplot(aes(y=pib_total, x=impostos)) + geom_point() +
+  scale_y_continuous(labels = scales::dollar) + theme_barbie() + theme(text=element_text(size=20)) +
+  xlab("impostos municipais") + ggtitle("PIB municipal de 2013 x impostos municipais")
+
+#Histograma
+pib_cid %>%
+  ggplot(aes(x=pib_per_capita)) + geom_histogram() +
+  theme_light() + theme(text=element_text(size=20)) + ggtitle("PIB per capita municipal")
+
+#ESTATISTICA REVISÃO
+x <- c(1,2,3,4,5,6,7,8,9,10)
+(media_x <- sum(x)/length(x)) #length - numero de observações
+
+x <- c(5,5,5,5,5,5,5)
+(media_x <- sum(x)/length(x))
+
+x <- c(1,3,5,7,9,11)
+(media_x <- sum(x)/length(x))
+
+x <- c(-5,-4,-3,-2,-1,1,2,3,4,5)
+(media_x <- sum(x)/length(x))
+
+x <- c(1,3,5,7,9,11)
+mean(x)
