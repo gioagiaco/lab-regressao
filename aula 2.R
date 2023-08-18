@@ -141,6 +141,7 @@ view(df)
 
 #visualização
 #gráficos
+install.packages("ggplot2")
 library(ggplot2)
 
 pib_cid %>%
