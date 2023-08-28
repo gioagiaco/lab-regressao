@@ -1,7 +1,6 @@
 ## 1
 
 # Instale o pacote
-options(repos = c(CRAN = "https://cran.r-project.org"))
 install.packages("PNADcIBGE")
 # Carregue o pacote
 library(PNADcIBGE)
@@ -77,16 +76,18 @@ cov(renda_vetor, horas_vetor)
 
 a = 2
 b = 3
+x = renda_vetor
+y= horas_vetor
 
 #mean(a* x + b * Y) == a * mean(x) + b * mean(y) -- Equação
 
 #Resposta:
 
 #mean(a*x + b*Y):
-mean(a * renda_vetor + b * horas_vetor) #3975.141
+mean(a * x + b * y) #3975.141
 
 #a * mean(x) + b * mean(Y):
-a * mean(renda_vetor) + b * mean(horas_vetor) #3975.141
+a * mean(x) + b * mean(y) #3975.141
 
 #Logo, se 3975.141 == 3975.141 a equação é verídica.
 
@@ -141,7 +142,7 @@ print(esperanca2)
 # i) apresente um grafico de densidade da variavel renda. 
 
 data_sem_superior = data_sem_na %>%
-  filter(Renda > 10.000)
+  filter(Renda <= 10000)
   
 data_sem_superior %>%
   ggplot(aes(Renda)) + geom_density() +
@@ -150,14 +151,14 @@ data_sem_superior %>%
   scale_y_continuous(labels = scales::comma) +
   scale_x_continuous(labels = scales::comma)
   
-#Interprete: esse pico presente no eixo Y logo no início do gráfico aponta que há uma concentração de indivíduos com uma renda relativamente baixa;
+#Interprete: o pico do gráfico se encontra em torno de 1250 reais, ou seja, há uma alta concentração de casos (nesse caso pessoas) em torno desse valor. Os demais picos são menores e sempre vão diminuindo, mostrando que conforme a renda aumenta, menor é a concentração de pessoas que possuem tal renda.
 
 # ii) qual a probabilidade de que, ao retirarmos aleatoriamente uma observacao (um individuo) dessa base de dados, sua renda seja estritamente maior do que 1000 e estritamente menor do que 2000 reais?
 
 data_sem_superior %>%
   summarise(probabilidade = mean(Renda > 1000 & Renda < 2000))
 
-#Resposta: 0.276
+#Resposta: 0.271
 
 # iii) apresente um grafico de densidade da renda dado que as horas trabalhadas (Y) sejam menores ou iguais a 20;
 
@@ -177,5 +178,4 @@ data_sem_superior %>%
           prob = soma / horas) %>%
   pull(prob) 
 
-#Resposta: 0.1330775
-
+#Resposta: 0.1244861
