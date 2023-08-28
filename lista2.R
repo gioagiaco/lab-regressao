@@ -1,6 +1,7 @@
 ## 1
 
 # Instale o pacote
+options(repos = c(CRAN = "https://cran.r-project.org"))
 install.packages("PNADcIBGE")
 # Carregue o pacote
 library(PNADcIBGE)
