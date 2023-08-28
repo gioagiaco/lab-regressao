@@ -1,6 +1,6 @@
 ## 1
 
-#Instale o pacote
+# Instale o pacote
 install.packages("PNADcIBGE")
 # Carregue o pacote
 library(PNADcIBGE)
@@ -41,7 +41,7 @@ data_sem_na %>%
   summarise(media = mean(Renda),
             variancia = var(Renda))
 
-#Resposta: Média - 1931; Variancia - 9543677
+#Resposta: Média - 1931; Variância - 9543677
 
 # iii) a renda media dos homens e das mulheres;
 
@@ -49,29 +49,25 @@ data_sem_na %>%
   group_by(Sexo) %>%
   summarise(medias = mean(Renda))
 
-#Resposta: Média homem - 2078; Média mulheres - 1721
+#Resposta: Média de renda dos Homens - 2078; Média de renda das Mulheres - 1721
 
 # iv) a renda media em cada estado brasileiro;
 
-medias = data_sem_na %>%
+medias_estados = data_sem_na %>%
   group_by(UF) %>%
   summarise(medias = mean(Renda))
 
-View(medias)
+View(medias_estados)
 
 # v) a covariancia entre a renda e o numero de horas trabalhadas
 
-data_sem_na %>%  
-  select(Renda)
-  renda_vetor = data_sem_na$Renda
+renda_vetor = data_sem_na$Renda
 
-data_sem_na %>%  
-  select(Horas_trabalhadas)
-  horas_vetor = data_sem_na$Horas_trabalhadas
+horas_vetor = data_sem_na$Horas_trabalhadas
   
 cov(renda_vetor, horas_vetor)
 
-#Resposta: 5776.884
+#Resposta: 5776.864
 
 ## 3
 
@@ -81,11 +77,17 @@ cov(renda_vetor, horas_vetor)
 a = 2
 b = 3
 
-#mean(a*x + b * Y) = a * mean(x) + b * mean(y)
+#mean(a* x + b * Y) == a * mean(x) + b * mean(y) -- Equação
 
+#Resposta:
+
+#mean(a*x + b*Y):
 mean(a * renda_vetor + b * horas_vetor) #3975.141
 
+#a * mean(x) + b * mean(Y):
 a * mean(renda_vetor) + b * mean(horas_vetor) #3975.141
+
+#Logo, se 3975.141 == 3975.141 a equação é verídica.
 
 ## 4 
 
@@ -102,13 +104,14 @@ dl = data_sem_na %>%
 dl %>%
   ggplot(aes(x = UF, y = renda_estados, fill = Sexo)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Média da Renda dos Estados (por gênero)",
+  labs(title = "Média da Renda dos Estados (por sexo)",
        x = "Estados", y = "Média da Renda", fill = "Sexo") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  aes(reorder(UF, - renda_estados))
 
 ## 5
 
-#Assuma duas variaveis aleatorias, X e Y, tais que X = renda e Y = horas trabalhadas.
+ #Assuma duas variaveis aleatorias, X e Y, tais que X = renda e Y = horas trabalhadas.
 
 # i) mean[X|10 <= Y <= 20]
 
@@ -133,34 +136,45 @@ print(esperanca2)
 
 ## 6
 
-#remova todas as observacoes cuja renda seja superior a 10.000 reais.
-#i) apresente um grafico de densidade da variavel renda. Interprete;
+# remova todas as observacoes cuja renda seja superior a 10.000 reais.
+# i) apresente um grafico de densidade da variavel renda. 
 
-data_sem_na %>%
-  filter(Renda > 10.000) %>%
-  ggplot(aes(Renda)) + geom_density() + 
+data_sem_superior = data_sem_na %>%
+  filter(Renda > 10.000)
+  
+data_sem_superior %>%
+  ggplot(aes(Renda)) + geom_density() +
+  labs(title = "Densidade da Renda (sem valores > 10.000)",
+       x = "Renda", y = "Densidade") +
   scale_y_continuous(labels = scales::comma) +
   scale_x_continuous(labels = scales::comma)
   
+#Interprete: esse pico presente no eixo Y logo no início do gráfico aponta que há uma concentração de indivíduos com uma renda relativamente baixa;
 
-#ii) qual a probabilidade de que, ao retirarmos aleatoriamente uma observacao (um individuo) dessa base de dados, sua renda seja estritamente maior do que 1000 e estritamente menor do que 2000 reais?
+# ii) qual a probabilidade de que, ao retirarmos aleatoriamente uma observacao (um individuo) dessa base de dados, sua renda seja estritamente maior do que 1000 e estritamente menor do que 2000 reais?
 
-data_sem_na %>%
+data_sem_superior %>%
   summarise(probabilidade = mean(Renda > 1000 & Renda < 2000))
 
-#iii) apresente um grafico de densidade da renda dado que as horas trabalhadas (Y) sejam menores ou iguais a 20;
-data_sem_na %>%
+#Resposta: 0.276
+
+# iii) apresente um grafico de densidade da renda dado que as horas trabalhadas (Y) sejam menores ou iguais a 20;
+
+data_sem_superior %>%
   filter(Horas_trabalhadas <= 20) %>%
   ggplot(aes(Renda)) + geom_density() + 
+  labs(title = "Densidade da renda (com horas trabalhadas ≤ 20)",
+       x = "Renda", y = "Densidade") +
   scale_y_continuous(labels = scales::comma) +
   scale_x_continuous(labels = scales::comma)
 
-#iv) calcule: P(1000 < X < 2000|Y ≤ 20)
+# iv) calcule: P(1000 < X < 2000|Y ≤ 20)
 
-menor_que_20 = sum(horas_vetor <= 20)
+data_sem_superior %>%
+  summarise(soma = sum(Renda > 1000 & Renda < 2000 & Horas_trabalhadas <= 20),
+          horas = sum(Horas_trabalhadas <= 20),
+          prob = soma / horas) %>%
+  pull(prob) 
 
-filtrar_x = sum(renda_vetor > 1000 & renda_vetor < 2000 & horas_vetor <= 20)
+#Resposta: 0.1330775
 
-prob_condicional = filtrar_x / menor_que_20
-
-print(prob_condicional)
