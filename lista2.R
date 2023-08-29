@@ -91,6 +91,12 @@ a * mean(x) + b * mean(y) #3975.141
 
 #Logo, se 3975.141 == 3975.141 a equação é verídica.
 
+##observacao: poderia ter feito assim tbm
+esquerda = mean(a * x + b * y)
+direita = a * mean(x) + b * mean(y)
+
+all.equal(esquerda, direita)
+
 ## 4 
 
 # Apresente um grafico que permita visualizacao adequada da media da renda por estado brasileiro e sexo.
@@ -108,8 +114,9 @@ dl %>%
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Média da Renda dos Estados (por sexo)",
        x = "Estados", y = "Média da Renda", fill = "Sexo") +
+  aes(reorder(UF, -renda_estados)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
-  aes(reorder(UF, - renda_estados))
+ 
 
 ## 5
 
@@ -177,5 +184,7 @@ data_sem_superior %>%
           horas = sum(Horas_trabalhadas <= 20),
           prob = soma / horas) %>%
   pull(prob) 
+
+#Resposta: 0.1244861
 
 #Resposta: 0.1244861
