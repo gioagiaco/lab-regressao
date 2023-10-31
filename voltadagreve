@@ -1,0 +1,91 @@
+##revisão
+
+#retomando funçao de esperança condicional
+
+#a esperanca condicional pode ser uma funcao nao linear mas vamos supor que podemos aproxima-la como uma reta
+
+#Beta = efeito marginal de X sobre Y, e representa quanto em media Y deve aumentar para um aumento de uma unidade em X
+
+## Estimando modelo de regressao 
+
+#uso de uma amostra de uma populacao
+#estimar alfa e beta (parametros da reta de regressao) a partir da amostra atraves de Minimos Quadrados Ordinarios 
+#as estimativas possuem chapeu 
+
+#Exemplo no R
+
+install.packages("abjData")
+library(abjData)
+library(tidyverse)
+library(ggplot2)
+
+#Observatorio das Falencias em SP - amostra de leiloes
+leiloes %>%
+  dplyr::filter(!is.na(valor_total_arrematado) &
+                  !is.na(valor_avaliacao_inicial)) %>%
+  ggplot(aes( x= valor_avaliacao_inicial,
+              y = valor_total_arrematado)) + geom_point()
+
+
+#com logaritmo
+
+p_reg_leiloes = leiloes %>%
+  mutate(log_valor_init = log(valor_avaliacao_inicial),
+         log_valor_fim = log(valor_total_arrematado)) %>%
+  dplyr::filter(!is.na(valor_total_arrematado) &
+                  !is.na(valor_avaliacao_inicial )) %>%
+  ggplot(aes(x = log_valor_init, 
+             y= log_valor_fim)) + geom_point()
+
+print(p_reg_leiloes)
+
+#achar um alfa e beta que descreva uma reta.
+#alfa é um interceptor, valor que cruza o eixo x
+#beta é inclinacao
+
+
+#residuos = diferenca na amostra entre a previsao e o que é observado
+
+p_reg_updated <- p_reg_leiloes  +
+  geom_segment(aes(x =  log_valor_init, y = log_valor_fim,
+                   xend = log_valor_init, 
+                   yend = predict(lm(log_valor_fim ~ log_valor_init))), color="red") + 
+  geom_smooth(method = "lm", se=FALSE)
+
+print(p_reg_updated)
+
+#achar a reta de regressao que tenha o menor erro possivel
+#pegar os residuos, elevar ao quadrado, somar os valores ao quadrado e pra cada reta que eu posso formar eu vou escolher aquela que tem o menor valor da soma.
+#essa que é a reta de regressao
+
+#####
+
+install.packages("abjData")
+library(abjData)
+library(tidyverse)
+
+leiloes_reg <- leiloes %>%
+  mutate(log_valor_init = log(valor_avaliacao_inicial),
+         log_valor_fim = log(valor_total_arrematado)) %>%
+  dplyr::filter(!is.na(valor_total_arrematado) &
+                  !is.na(valor_avaliacao_inicial ))
+
+reg_leiloes = lm(log_valor_fim ~ log_valor_init, data=leiloes_reg)
+
+summary(reg_leiloes)
+
+cov(leiloes_reg$log_valor_fim, leiloes_reg$log_valor_init)/var(leiloes_reg$log_valor_init)
+
+#ou seja,
+# Calcule utilizando explicitamente a fórmula
+covariance <- cov(leiloes$valor_total_arrematado, leiloes$valor_avaliacao_inicial)
+variance <- var(leiloes$valor_avaliacao_inicial)
+beta <- covariance/variance
+
+# Calcule pela função "lm"
+leiloes %>% lm(valor_total_arrematado ~ valor_avaliacao_inicial, data =.)
+Nesse código, calcula-se sem o log. Pra fazer com log, é só criar a variável.
+
+## Erro padrao - std error
+#Nada mais é que o desviao padrao amostral do meu estimador
+
